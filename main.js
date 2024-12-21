@@ -16,6 +16,20 @@ const program = new Command();
 // Configuration file path
 const configPath = path.join(os.homedir(), ".ai-cli-config.json");
 
+process.on("SIGINT", () => {
+  console.log(chalk.yellow("\nExiting gracefully..."));
+  process.exit(0); // Clean exit
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  if (reason.name === "ExitPromptError") {
+    console.log(chalk.yellow("\nForce quite! bye bye."));
+    process.exit(0); // Clean exit
+  } else {
+    console.error(chalk.red("Unhandled rejection:"), reason);
+  }
+});
+
 // Check if configuration file exists, create it if not
 if (!fs.existsSync(configPath)) {
   const defaultConfig = {
@@ -44,13 +58,12 @@ const showHeader = () => {
     )
   );
 };
-
+showHeader();
 // Command to view or edit the configuration
 program
   .command("config")
   .description("View or update the API key, instructions, and model")
   .action(async () => {
-    showHeader();
     const config = loadConfig();
 
     // Show current configuration
@@ -128,8 +141,6 @@ program
   .command("chat")
   .description("Start a conversation with the AI")
   .action(async () => {
-    showHeader();
-
     let isChatting = true;
     const conversationHistoryPath = path.join(
       os.homedir(),
