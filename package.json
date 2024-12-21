@@ -1,10 +1,10 @@
 {
-  "name": "acli",
+  "name": "help_ai",
   "version": "1.0.0",
   "main": "main.js",
   "type": "module",
   "bin": {
-    "acli": "main.js"
+    "help_ai": "main.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
