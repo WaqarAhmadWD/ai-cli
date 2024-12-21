@@ -48,8 +48,8 @@ const executeChainOfCommands = async (prompt) => {
   //       .filter((line) => line !== "bash")
   //   );
   // }
-
-  return await executeCommands(formator(prompt));
+  const commands = await formator(prompt);
+  return await executeCommands(commands);
 };
 
 // Function to execute commands and rollback on failure
