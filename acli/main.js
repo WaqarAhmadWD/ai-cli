@@ -173,56 +173,42 @@ program
       );
       spinner.stop();
       spinner.clear();
+      // Keep trying until the task is successful or retry limit is reached
       if (aiResponse?.message) {
         let isExecuted = { success: false, error: null }; // Initial state
         let retryAttempts = 0; // Optional: To limit the number of retries
+        let aiResponseMessage = aiResponse; // Use `let` to allow reassignment
 
         // Keep trying until the task is successful or retry limit is reached
-        if (aiResponse?.message) {
-          let isExecuted = { success: false, error: null }; // Initial state
-          let retryAttempts = 0; // Optional: To limit the number of retries
-          let aiResponseMessage = aiResponse; // Use `let` to allow reassignment
-
-          // Keep trying until the task is successful or retry limit is reached
-          while (!isExecuted.success && retryAttempts < 5) {
-            try {
-              // Execute the commands
-              isExecuted = await executeChainOfCommands(
-                aiResponseMessage?.message
-              );
-
-              if (isExecuted.error) {
-                console.error(
-                  chalk.red(`Error executing commands: ${isExecuted.error}`)
-                );
-                // If there's an error, retry after getting an AI response
-                aiResponseMessage = await getAIResponseFromModel(
-                  isExecuted.error + userInput,
-                  conversationHistory,
-                  config
-                );
-              }
-
-              if (isExecuted.success) {
-                console.log(chalk.cyan(`Your task is successfully done!`));
-                return isExecuted; // Exit the loop if successful
-              }
-
-              retryAttempts++;
-              console.log(chalk.yellow(`Retrying attempt ${retryAttempts}...`));
-            } catch (err) {
-              console.error(chalk.red(`Unexpected error: ${err.message}`));
-              break; // If an unexpected error occurs, break out of the loop
-            }
-          }
-
-          // If the retry limit is reached
-          if (!isExecuted.success) {
-            console.log(
-              chalk.red(
-                `Failed to execute task after ${retryAttempts} attempts.`
-              )
+        while (!isExecuted.success && retryAttempts < 5) {
+          try {
+            // Execute the commands
+            isExecuted = await executeChainOfCommands(
+              aiResponseMessage?.message
             );
+
+            if (isExecuted.error) {
+              console.error(
+                chalk.red(`Error executing commands: ${isExecuted.error}`)
+              );
+              // If there's an error, retry after getting an AI response
+              aiResponseMessage = await getAIResponseFromModel(
+                isExecuted.error + userInput,
+                conversationHistory,
+                config
+              );
+            }
+
+            if (isExecuted.success) {
+              console.log(chalk.cyan(`Your task is successfully done!`));
+              return isExecuted; // Exit the loop if successful
+            }
+
+            retryAttempts++;
+            console.log(chalk.yellow(`Retrying attempt ${retryAttempts}...`));
+          } catch (err) {
+            console.error(chalk.red(`Unexpected error: ${err.message}`));
+            break; // If an unexpected error occurs, break out of the loop
           }
         }
 
@@ -234,19 +220,26 @@ program
         }
       }
 
-      if (aiResponse.error) {
-        console.error(chalk.red(`Error: ${aiResponse.error}`));
-      } else {
-        console.log(chalk.cyan(`AI: ${aiResponse?.message}`));
+      // If the retry limit is reached
+      if (!isExecuted.success) {
+        console.log(
+          chalk.red(`Failed to execute task after ${retryAttempts} attempts.`)
+        );
       }
-
-      // Append to conversation history
-      conversationHistory.push({ user: userInput, ai: aiResponse });
-      fs.writeFileSync(
-        conversationHistoryPath,
-        JSON.stringify(conversationHistory, null, 2)
-      );
     }
+
+    if (aiResponse.error) {
+      console.error(chalk.red(`Error: ${aiResponse.error}`));
+    } else {
+      console.log(chalk.cyan(`AI: ${aiResponse?.message}`));
+    }
+
+    // Append to conversation history
+    conversationHistory.push({ user: userInput, ai: aiResponse });
+    fs.writeFileSync(
+      conversationHistoryPath,
+      JSON.stringify(conversationHistory, null, 2)
+    );
   });
 
 // Function to get AI response from the selected model
