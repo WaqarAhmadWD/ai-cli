@@ -197,7 +197,7 @@ program
                 );
                 // If there's an error, retry after getting an AI response
                 aiResponseMessage = await getAIResponseFromModel(
-                  isExecuted.error,
+                  isExecuted.error + userInput,
                   conversationHistory,
                   config
                 );
@@ -255,6 +255,7 @@ const getAIResponseFromModel = async (
   conversationHistory,
   config
 ) => {
+  console.log(userInput);
   try {
     const { apiKey, instructions, model } = config;
 
@@ -293,6 +294,7 @@ const getAIResponseFromModel = async (
     );
     // for gemini
     if (response?.data?.candidates[0]?.content?.parts[0]?.text) {
+      console.log(response?.data?.candidates[0]?.content?.parts[0]?.text);
       return {
         message: response?.data?.candidates[0]?.content?.parts[0]?.text,
       };
