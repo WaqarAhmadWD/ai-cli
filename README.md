@@ -27,7 +27,7 @@ _help_ai_ is extremely user-friendly and works in a straightforward manner:
 
 - **User Input**
   1. **User Input:** You provide a prompt describing your terminal task.
-  2. **AI Processing:** You provide a prompt describing your terminal task.
+  2. **AI Processing:**The tool sends the prompt to the AI with default instructions. It receives a series of terminal commands in return.
   3. **Command Execution:** These commands are executed sequentially. In case of failure, the tool rolls back the changes and reverts to AI for new commands.
   4. **Retry Mechanism:** The process will repeat up to 5 times (this can be adjusted based on your needs) until the task is completed successfully.
   5. **Success Message:** Once successful, a completion message will be displayed to the user.
@@ -60,15 +60,14 @@ This package is still in its early stages of development. We encourage contribut
 
    ```
 
-2. Make configuration:
+2. Make configuration (add api key, custom instruction, custom failure tries and select model):
 
    ```bash
-   // add api key, custom instruction, custom failure tries and select model
    help_ai config
 
    ```
 
-3. example of using all of them:
+3. run ai:
    ```bash
     help_ai chat
    ```
