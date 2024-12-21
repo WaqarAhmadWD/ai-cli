@@ -1,0 +1,36 @@
+{
+  "conversation": [
+    {
+      "user": {
+        "data": "Create a new node project in Document folder",
+        "isUser": true
+      },
+      "ai": {
+        "command": "cd ~/Documents && mkdir new-node-project && cd new-node-project",
+        "status": "incomplete"
+      }
+    },
+    {
+      "user": {
+        "data": "",
+        "isUser": false,
+        "isOutput": true
+      },
+      "ai": {
+        "command": "npm init -y",
+        "status": "incomplete"
+      }
+    },
+    {
+      "user": {
+        "data": "",
+        "isUser": false,
+        "isOutput": true
+      },
+      "ai": {
+        "command": "",
+        "status": "complete"
+      }
+    }
+  ]
+}
