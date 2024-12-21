@@ -22,6 +22,7 @@ if (!fs.existsSync(configPath)) {
     apiKey: "",
     instructions:
       "you must give me a series of CLI commands in bash, nothing more than. I am strictly preventing you from saying 'ok'. program: ",
+    tries: 5,
     model: "gemini-1.5-flash",
   };
   fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
@@ -57,6 +58,7 @@ program
     console.log(chalk.cyan(`API Key: ${config.apiKey}`));
     console.log(chalk.cyan(`Instructions: ${config.instructions}`));
     console.log(chalk.cyan(`Model: ${config.model}`));
+    console.log(chalk.cyan(`tries: ${config?.tries}`));
 
     // Ask if the user wants to update the configuration
     const { updateConfig } = await inquirer.prompt([
@@ -70,33 +72,50 @@ program
     ]);
 
     if (updateConfig) {
-      const { newApiKey, newInstructions, newModel } = await inquirer.prompt([
-        {
-          type: "input",
-          name: "newApiKey",
-          message: "Enter the new API Key:",
-          default: config.apiKey,
-        },
-        {
-          type: "input",
-          name: "newInstructions",
-          message: "Enter the new Instructions:",
-          default: config.instructions,
-        },
-        {
-          type: "list",
-          name: "newModel",
-          message: "Choose the AI model:",
-          choices: ["gemini-1.5-flash", "openai-gpt-3.5", "custom-model"], // Add more models if needed
-          default: config.model,
-        },
-      ]);
+      const { newApiKey, newInstructions, newModel, newTries } =
+        await inquirer.prompt([
+          {
+            type: "input",
+            name: "newApiKey",
+            message: "Enter the new API Key:",
+            default: config.apiKey,
+          },
+          {
+            type: "input",
+            name: "newInstructions",
+            message: "Enter the new Instructions:",
+            default: config.instructions,
+          },
+          {
+            type: "input",
+            name: "newTries",
+            message: "Enter how many tries should be held after failure:",
+            default: config?.tries,
+            validate: (input) => {
+              // Ensure the input is a valid number
+              const num = Number(input);
+              if (isNaN(num) || num <= 0) {
+                return "Please enter a valid number greater than 0 for tries.";
+              }
+              return true; // Validation passed
+            },
+          },
+          {
+            type: "list",
+            name: "newModel",
+            message: "Choose the AI model:",
+            choices: ["gemini-1.5-flash", "openai-gpt-3.5", "custom-model"], // Add more models if needed
+            default: config.model,
+          },
+        ]);
 
+      const tries = Number(newTries);
       // Update the configuration file
       const updatedConfig = {
         apiKey: newApiKey,
         instructions: newInstructions,
         model: newModel,
+        tries: tries,
       };
       fs.writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2));
 
@@ -180,7 +199,7 @@ program
         let aiResponseMessage = aiResponse; // Use `let` to allow reassignment
 
         // Keep trying until the task is successful or retry limit is reached
-        while (!isExecuted.success && retryAttempts < 5) {
+        while (!isExecuted.success && retryAttempts < parseInt(config.tries)) {
           try {
             // Execute the commands
             isExecuted = await executeChainOfCommands(
