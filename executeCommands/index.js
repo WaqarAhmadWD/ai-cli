@@ -1,19 +1,55 @@
 import { execSync } from "child_process";
 
-const executeChainOfCommands = async (prompt) => {
-  const regex = /```([\s\S]*?)```/g;
+const formator = async (prompt) => {
+  const regex = /```(.*?)\n([\s\S]*?)```/g;
   const matches = [];
   let match;
+
   while ((match = regex.exec(prompt)) !== null) {
-    const codeBlock = match[1].trim();
-    matches.push(
-      ...codeBlock
-        .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line !== "bash")
-    );
+    const language = match[1].trim(); // e.g., "bash" or "python"
+    const commands = match[2]
+      .trim()
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line); // Ignore empty lines
+    matches.push({ language, commands });
   }
-  return await executeCommands(matches);
+
+  const results = [];
+  for (const { language, commands } of matches) {
+    if (language !== "bash") {
+      results.push({ error: `Unsupported language: ${language}`, commands });
+      continue;
+    }
+
+    for (const command of commands) {
+      try {
+        const result = await executeCommand(command);
+        results.push({ success: true, ...result });
+      } catch (err) {
+        results.push({ success: false, ...err });
+      }
+    }
+  }
+
+  return results;
+};
+
+const executeChainOfCommands = async (prompt) => {
+  // const regex = /```([\s\S]*?)```/g;
+  // const matches = [];
+  // let match;
+  // while ((match = regex.exec(prompt)) !== null) {
+  //   const codeBlock = match[1].trim();
+  //   matches.push(
+  //     ...codeBlock
+  //       .split("\n")
+  //       .map((line) => line.trim())
+  //       .filter((line) => line !== "bash")
+  //   );
+  // }
+
+  return await executeCommands(formator(prompt));
 };
 
 // Function to execute commands and rollback on failure
