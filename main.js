@@ -239,7 +239,7 @@ program
               );
               // If there's an error, retry after getting an AI response
               aiResponseMessage = await getAIResponseFromModel(
-                isExecuted.error + userInput,
+                `${isExecuted.error}. user input:${userInput}`,
                 conversationHistory,
                 config
               );
