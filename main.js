@@ -10,6 +10,10 @@ import os from "os";
 import axios from "axios";
 import ora from "ora"; // Import ora for loading spinner
 import executeChainOfCommands from "./executeCommands/index.js";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const program = new Command();
 
@@ -48,6 +52,17 @@ const loadConfig = () => {
 };
 
 // Command to show the header
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "package.json"), "utf-8")
+);
+
+program
+  .version(packageJson.version, "-v, --version", "output the current version")
+  .description(
+    "AI-powered CLI to execute tasks based on natural language input"
+  );
+
+// Command to show the header
 const showHeader = () => {
   console.log(
     chalk.blue(
@@ -57,6 +72,7 @@ const showHeader = () => {
       })
     )
   );
+  console.log(chalk.green(`Version: ${packageJson.version}`)); // Display version in the header
 };
 showHeader();
 // Command to view or edit the configuration
