@@ -133,7 +133,7 @@ program
             type: "list",
             name: "newModel",
             message: "Choose the AI model:",
-            choices: ["gemini-1.5-flash", "openai-gpt-3.5", "custom-model"], // Add more models if needed
+            choices: ["gemini-1.5-flash", "gpt-3.5-turbo", "custom-model"], // Add more models if needed
             default: config.model,
           },
         ]);
@@ -302,7 +302,7 @@ const getAIResponseFromModel = async (
     let apiUrl = "";
     if (model === "gemini-1.5-flash") {
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    } else if (model === "openai-gpt-3.5") {
+    } else if (model === "gpt-3.5-turbo") {
       apiUrl = `https://api.openai.com/v1/completions`;
     } else {
       // Custom model handling can be added here
@@ -325,7 +325,7 @@ const getAIResponseFromModel = async (
       {
         headers: {
           "Content-Type": "application/json",
-          ...(model === "openai-gpt-3.5" && {
+          ...(model === "gpt-3.5-turbo" && {
             Authorization: `Bearer ${apiKey}`,
           }),
         },
@@ -338,7 +338,7 @@ const getAIResponseFromModel = async (
         message: response?.data?.candidates[0]?.content?.parts[0]?.text,
       };
     }
-    // for openai-gpt-3.5
+    // for gpt-3.5-turbo
     if (response?.data?.choices[0]?.text) {
       return {
         message: response?.data?.choices[0]?.text.trim(),
