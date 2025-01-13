@@ -39,7 +39,7 @@ if (!fs.existsSync(configPath)) {
   const defaultConfig = {
     apiKey: "",
     instructions:
-      "you must give me a series of CLI commands in bash, nothing more than. I am strictly preventing you from saying 'ok'. use just executable bash commands  that doesn't require configuration or saving etc. in case of reading or writing operation use echo Task:",
+      "you must give me a series of CLI commands in bash, nothing more than. I am strictly preventing you from saying 'ok'. use just executable bash commands  that doesn't require configuration or saving etc. use echo instead of vim or nano",
     tries: 5,
     model: "gemini-1.5-flash",
   };
@@ -224,7 +224,7 @@ program
         let isExecuted = { success: false, error: null }; // Initial state
         let retryAttempts = 0; // Optional: To limit the number of retries
         let aiResponseMessage = aiResponse; // Use `let` to allow reassignment
-
+        let historyError = "";
         // Keep trying until the task is successful or retry limit is reached
         while (!isExecuted.success && retryAttempts < parseInt(config.tries)) {
           try {
@@ -237,9 +237,10 @@ program
               console.error(
                 chalk.red(`Error executing commands: ${isExecuted.error}`)
               );
+              historyError += isExecuted.error;
               // If there's an error, retry after getting an AI response
               aiResponseMessage = await getAIResponseFromModel(
-                `${isExecuted.error}. user input:${userInput}`,
+                `Error: ${historyError}. user input:${userInput}`,
                 conversationHistory,
                 config
               );
@@ -316,7 +317,7 @@ const getAIResponseFromModel = async (
           {
             parts: [
               {
-                text: instructions + userInput,
+                text: `Instructions: ${instructions}, user Input: ${userInput}`,
               },
             ],
           },
