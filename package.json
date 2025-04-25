@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node main.js"
   },
-  "keywords": [],
+  "keywords": ["npm","help_ai","devOps","ai","bash","tool"],
   "author": "",
   "license": "ISC",
   "dependencies": {

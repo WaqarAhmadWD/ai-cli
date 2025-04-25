@@ -39,7 +39,7 @@ if (!fs.existsSync(configPath)) {
   const defaultConfig = {
     apiKey: "",
     instructions:
-      "you must give me a series of CLI commands in bash, nothing more than. I am strictly preventing you from saying 'ok'. use just executable bash commands  that doesn't require configuration or saving etc. use echo instead of vim or nano",
+      "you must give me a series of CLI commands in bash, nothing more than. I am strictly preventing you from saying 'ok'. use echo instead of vim or nano just in case of updating a file",
     tries: 5,
     model: "gemini-1.5-flash",
   };
